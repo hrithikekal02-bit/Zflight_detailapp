@@ -1,50 +1,69 @@
-@AbapCatalog.sqlViewName: 'ZANALYTICAL'
+@AbapCatalog.sqlViewName: 'ZEO_SPFLI_1'
 @AbapCatalog.compiler.compareFilter: true
 @AbapCatalog.preserveKey: true
 @AccessControl.authorizationCheck: #NOT_REQUIRED
-@EndUserText.label: 'Analytical lsit page'
-@Metadata.allowExtensions: true
+@EndUserText.label: 'Airline details'
 @OData.publish: true
-
-@UI.chart: [{
-qualifier: 'chartDefault',
-chartType: #COLUMN,
-description: 'Sales Information',
-dimensions: ['SalesOrg'],
-measures: ['netvalue'],
-dimensionAttributes: [{ dimension:'SalesOrg', role:#SERIES}],
-measureAttributes: [{ measure: 'netvalue', role:#AXIS_1 }]
- }]
+@Analytics.dataCategory: #CUBE
+@VDM.viewType: #COMPOSITE
+@Metadata.allowExtensions: true
+@Search.searchable: true
+@ObjectModel.semanticKey: ['Airline_code','Flight_Connection_Number']
+@UI.headerInfo:
+{ typeName: 'Connection',typeNamePlural: 'Connection' , 
+title:{type: #STANDARD, value: 'Airline_name' },
+description:{ type: #STANDARD , value: 'Airline_code' }
+ } 
  
- 
-define view Zeo_analytical as select from vbak as vh inner join vbap as vp 
-           on vh.vbeln = vp.vbeln
+define view Zeo_spfli_updated as select from spfli as _connection
+association[1] to scarr as _carrier on $projection.Airline_code = _carrier.carrid 
+association[1..*] to Z_I_sflight_details as _flight on $projection.Airline_code = _flight.Carrier_ID
+                                           and $projection.Flight_Connection_Number = _flight.ConnID 
 {
-@Consumption.valueHelpDefinition: [{entity: { name : 'I_SalesOrganizationValueHelp' ,  element : 'vkorg' }}]
-key vh.vkorg  as SalesOrg,
-key vp.posnr as item,
-    vp.werks as plant,
-    vh.spart as division,
-@Consumption.valueHelpDefinition: [{entity: { name : 'I_DistributionChannelValueHelp' ,  element : 'DistributionChannel' }}]
-    vh.vtweg as distchannel,
-    vp.brgew as grossweight,
-    @DefaultAggregation: #SUM
-    vp.netwr as netvalue,
-    vp.waerk as currency,
-    vh.audat as documentdate,
-    case substring (vh.audat, 5 , 2 ) 
-    when '01' then concat('JAN-', substring(vh.audat,1,4))
-    when '02' then concat('FEB-', substring(vh.audat,1,4))
-    when '03' then concat('MAR-', substring(vh.audat,1,4))
-    when '04' then concat('APR-', substring(vh.audat,1,4))
-    when '05' then concat('MAY-', substring(vh.audat,1,4))
-    when '06' then concat('JUN-', substring(vh.audat,1,4))
-    when '07' then concat('JUL-', substring(vh.audat,1,4))
-    when '08' then concat('AUG-', substring(vh.audat,1,4))
-    when '09' then concat('SEP-', substring(vh.audat,1,4))
-    when '10' then concat('OCT-', substring(vh.audat,1,4))
-    when '11' then concat('NOV-', substring(vh.audat,1,4))
-    when '12' then concat('DEC-', substring(vh.audat,1,4))
-    else 'Dummy'
-    end as monYR
-    }
+ 
+   key _connection.carrid as Airline_code,
+    
+   key _connection.connid as Flight_Connection_Number,
+    
+    @ObjectModel.mandatory: true
+    @Search.defaultSearchElement: true
+    @Search.fuzzinessThreshold:0.5
+    @ObjectModel.text.element: ['Airline_code']
+    @Consumption.valueHelpDefinition: [{entity.name: 'Zeo_CarrierSH',entity.element: 'carrname' }]
+    @Consumption.filter:{mandatory: true,defaultValue:'American Airlines' , multipleSelections: true,selectionType:#SINGLE }
+    _carrier.carrname     as Airline_name,
+    
+    _carrier.url          as weburl,
+    
+    _connection.countryfr as Country_Key,
+    
+    _connection.cityfrom  as Departure_city,
+    
+    @ObjectModel.text.element: ['Departure_city']
+    _connection.airpfrom  as Departure_Airport,
+    
+    _connection.countryto as Country_Key2,
+    
+    @ObjectModel.text.element: ['Destination_airport']
+    _connection.cityto    as Arrival_city,
+    
+    @ObjectModel.text.element: ['Arrival_city']
+     _connection.airpto   as Destination_airport,
+    
+    _connection.deptime   as Departure_time,
+    
+    _connection.arrtime   as Arrival_time,
+    
+   _connection.distance   as Distance,
+    
+     _connection.distid   as Distance_id,
+    
+     _connection.fltype   as Flight_type,
+    
+     _connection.period   as Journey_Duration,
+    
+    //Public association 
+     _carrier,
+     _flight
+}
+    
