@@ -1,0 +1,50 @@
+@AbapCatalog.sqlViewName: 'ZANALYTICAL'
+@AbapCatalog.compiler.compareFilter: true
+@AbapCatalog.preserveKey: true
+@AccessControl.authorizationCheck: #NOT_REQUIRED
+@EndUserText.label: 'Analytical lsit page'
+@Metadata.allowExtensions: true
+@OData.publish: true
+
+@UI.chart: [{
+qualifier: 'chartDefault',
+chartType: #COLUMN,
+description: 'Sales Information',
+dimensions: ['SalesOrg'],
+measures: ['netvalue'],
+dimensionAttributes: [{ dimension:'SalesOrg', role:#SERIES}],
+measureAttributes: [{ measure: 'netvalue', role:#AXIS_1 }]
+ }]
+ 
+ 
+define view Zeo_analytical as select from vbak as vh inner join vbap as vp 
+           on vh.vbeln = vp.vbeln
+{
+@Consumption.valueHelpDefinition: [{entity: { name : 'I_SalesOrganizationValueHelp' ,  element : 'vkorg' }}]
+key vh.vkorg  as SalesOrg,
+key vp.posnr as item,
+    vp.werks as plant,
+    vh.spart as division,
+@Consumption.valueHelpDefinition: [{entity: { name : 'I_DistributionChannelValueHelp' ,  element : 'DistributionChannel' }}]
+    vh.vtweg as distchannel,
+    vp.brgew as grossweight,
+    @DefaultAggregation: #SUM
+    vp.netwr as netvalue,
+    vp.waerk as currency,
+    vh.audat as documentdate,
+    case substring (vh.audat, 5 , 2 ) 
+    when '01' then concat('JAN-', substring(vh.audat,1,4))
+    when '02' then concat('FEB-', substring(vh.audat,1,4))
+    when '03' then concat('MAR-', substring(vh.audat,1,4))
+    when '04' then concat('APR-', substring(vh.audat,1,4))
+    when '05' then concat('MAY-', substring(vh.audat,1,4))
+    when '06' then concat('JUN-', substring(vh.audat,1,4))
+    when '07' then concat('JUL-', substring(vh.audat,1,4))
+    when '08' then concat('AUG-', substring(vh.audat,1,4))
+    when '09' then concat('SEP-', substring(vh.audat,1,4))
+    when '10' then concat('OCT-', substring(vh.audat,1,4))
+    when '11' then concat('NOV-', substring(vh.audat,1,4))
+    when '12' then concat('DEC-', substring(vh.audat,1,4))
+    else 'Dummy'
+    end as monYR
+    }
