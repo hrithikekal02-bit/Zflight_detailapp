@@ -1,64 +1,68 @@
-@Metadata.layer:#PARTNER
-@UI.chart: [{
-qualifier: 'chartDefault',
-chartType: #COLUMN,
-description: 'Sales Information',
-dimensions: ['SalesOrg'],
-measures: ['netvalue'],
-dimensionAttributes: [{ dimension:'SalesOrg', role:#SERIES }],
-measureAttributes: [{ measure: 'netvalue', role:#AXIS_1 }]
- },
- { qualifier: 'visualDate',
- chartType: #BAR,
- description: 'Month/Year Sales',
- dimensions: ['monYr'],
- measures: ['netvalue'],
- dimensionAttributes: [{dimension:'monYr', role:#SERIES }],
- measureAttributes: [{measure: 'netvalue', role:#AXIS_1  }] }]
- 
- @UI.presentationVariant: [{  qualifier: 'Default', visualizations: [{type: #AS_CHART, qualifier: 'chartDefault' }] },
- { qualifier: 'visualDateFilter', visualizations: [{ type: #AS_CHART, qualifier: 'visualDate' }] }]
+@Metadata.layer: #CUSTOMER
 
-annotate view Zeo_analytical
+
+annotate view Zeo_spfli_updated
     with 
+ 
 {
 
-      @UI.lineItem: [{position: 10 ,
-      qualifier : 'Default'}]
-      @UI.selectionField: [{position : 10}]
-      @UI.identification: [{position: 10 }]
-      @UI.identification: [{label: 'Sales Org' }]
-      SalesOrg ;
+
+        @UI.facet: [ { id:'HeaderInformation' ,
+                             purpose:#HEADER ,
+                             label: 'Header Info' ,
+                             targetQualifier: 'Header'
+                             ,type: #FIELDGROUP_REFERENCE
+                             ,position: 10 },
+                             
+                             { id: 'Flight',
+                             purpose: #STANDARD,
+                             type:#LINEITEM_REFERENCE,
+                             label: 'Flight',
+                             position: 10,
+                             targetElement: '_flight'  
+                             },
+                             
+                             { id: 'CARRIER',
+                             purpose: #STANDARD,
+                             type:#LINEITEM_REFERENCE,
+                             label: 'CARRIER',
+                             position: 20,
+                             targetElement: '_carrier'  
+                             }
+                            ]                            
+
+@UI.lineItem: [{position: 1 ,label: 'Airline Code' }]
+@UI.textArrangement: #TEXT_LAST
+@UI.selectionField: [{position: 10 }]
+    Airline_code;
+@UI.lineItem: [{position: 2 ,label: 'Airline Name' }]
+@UI.textArrangement: #TEXT_LAST
+//@UI.selectionField: [{position: 20 }]
+    Flight_Connection_Number;
+
+@UI.lineItem: [{position: 10 ,label: 'Airline Name' }]
+@UI.textArrangement: #TEXT_LAST
+@UI.selectionField: [{position: 20 }]
+@UI.fieldGroup: [{qualifier: 'Header', position: 10 }]
+    Airline_name ;
     
-      @UI.lineItem: [{position : 20}]
-      item;
-        
-      @UI.lineItem: [{position: 30 }]
-      plant;
-     
-      @UI.selectionField: [{position : 20 }]
-      @UI.lineItem: [{position: 40 }]
-      division;
-      
-      @UI.selectionField: [{position : 30 }]
-      @UI.lineItem: [{position: 50 }]
-      distchannel;
-      
-      @UI.lineItem: [{position: 60 }]
-      grossweight;
-      
-      @UI.lineItem: [{position: 70 }]
-      netvalue;
-      
-      @UI.lineItem: [{position: 80 }]
-      currency;
-      
-      // @UI.lineItem: [{position: 90 }]
-      //documentdate;
-     
-      @UI.selectionField: [{position : 40 }]
-      @UI.lineItem: [{position: 90 }]
-      @EndUserText.label: 'Record Date'
-      monYR;
-   
+@UI.lineItem: [{ position: 15, url: 'weburl', type: #WITH_URL}]
+    weburl ;
+    
+@UI.textArrangement: #TEXT_LAST
+@UI.lineItem: [{position: 20 ,label: 'Departure Airport' }]    
+    Departure_Airport ;
+    
+@UI.lineItem: [{position: 30 ,label: 'Destination Airport' }]    
+    Arrival_city;
+    
+@UI.lineItem: [{position: 40 ,label: 'Arrival Time' }]
+    Arrival_time;
+
+@UI.lineItem: [{position: 50 ,label: 'Departure Time' }]
+    Departure_time;
+
+@UI.lineItem: [{position: 60 ,label: 'Disatnce' }]
+    Distance;
+    
 }
