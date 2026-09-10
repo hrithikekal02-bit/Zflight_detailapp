@@ -1,0 +1,64 @@
+@Metadata.layer:#PARTNER
+@UI.chart: [{
+qualifier: 'chartDefault',
+chartType: #COLUMN,
+description: 'Sales Information',
+dimensions: ['SalesOrg'],
+measures: ['netvalue'],
+dimensionAttributes: [{ dimension:'SalesOrg', role:#SERIES }],
+measureAttributes: [{ measure: 'netvalue', role:#AXIS_1 }]
+ },
+ { qualifier: 'visualDate',
+ chartType: #BAR,
+ description: 'Month/Year Sales',
+ dimensions: ['monYr'],
+ measures: ['netvalue'],
+ dimensionAttributes: [{dimension:'monYr', role:#SERIES }],
+ measureAttributes: [{measure: 'netvalue', role:#AXIS_1  }] }]
+ 
+ @UI.presentationVariant: [{  qualifier: 'Default', visualizations: [{type: #AS_CHART, qualifier: 'chartDefault' }] },
+ { qualifier: 'visualDateFilter', visualizations: [{ type: #AS_CHART, qualifier: 'visualDate' }] }]
+
+annotate view Zeo_analytical
+    with 
+{
+
+      @UI.lineItem: [{position: 10 ,
+      qualifier : 'Default'}]
+      @UI.selectionField: [{position : 10}]
+      @UI.identification: [{position: 10 }]
+      @UI.identification: [{label: 'Sales Org' }]
+      SalesOrg ;
+    
+      @UI.lineItem: [{position : 20}]
+      item;
+        
+      @UI.lineItem: [{position: 30 }]
+      plant;
+     
+      @UI.selectionField: [{position : 20 }]
+      @UI.lineItem: [{position: 40 }]
+      division;
+      
+      @UI.selectionField: [{position : 30 }]
+      @UI.lineItem: [{position: 50 }]
+      distchannel;
+      
+      @UI.lineItem: [{position: 60 }]
+      grossweight;
+      
+      @UI.lineItem: [{position: 70 }]
+      netvalue;
+      
+      @UI.lineItem: [{position: 80 }]
+      currency;
+      
+      // @UI.lineItem: [{position: 90 }]
+      //documentdate;
+     
+      @UI.selectionField: [{position : 40 }]
+      @UI.lineItem: [{position: 90 }]
+      @EndUserText.label: 'Record Date'
+      monYR;
+   
+}
